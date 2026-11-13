@@ -1,13 +1,156 @@
-const $=(s,r=document)=>r.querySelector(s),img=(f,alt,r)=>`<div class="ph" data-file="${f}"${r?` style="aspect-ratio:${r}"`:""}><img src="assets/images/${f}" alt="${alt}" loading="lazy"></div>`;
-const grid=$("#grid"),fl=$("#filters");let shown=ORIGINALS,cur=0;
-function draw(){grid.innerHTML=shown.map((o,i)=>`<button class="tile" data-i="${i}" aria-label="View ${o.title}, original ${o.n}">${img("originals/"+o.file,"Black ink illustration, original "+o.n,o.ratio)}<span class="t">${o.title}</span><span class="m">${o.medium}</span></button>`).join("")}
-["All",...new Set(ORIGINALS.map(o=>o.cat))].forEach((c,i)=>{const b=document.createElement("button");b.textContent=c;b.setAttribute("aria-pressed",i==0);b.onclick=()=>{fl.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x==b));shown=c=="All"?ORIGINALS:ORIGINALS.filter(o=>o.cat==c);draw()};fl.append(b)});draw();
-$("#editionlist").innerHTML=EDITIONS.map(e=>`<div class="row">${img("editions/"+e.file,"Edition placeholder")}<div><h3>${e.name}</h3><span class="flag">Illustrative placeholder</span></div><dl><dt>Sizes</dt><dd>To be confirmed</dd><dt>Edition</dt><dd>To be confirmed</dd><dt>Paper and print</dt><dd>To be confirmed</dd><dt>Price</dt><dd>To be confirmed</dd><dt>Availability</dt><dd>Not yet available</dd></dl><a class="go" href="mailto:${EMAIL}?subject=Edition enquiry">Register interest</a></div>`).join("");
-const d=$("#qv");
-function open(i){cur=i;const o=shown[i];d.querySelector(".view")?.classList.remove("z");d.innerHTML=`<div class="view" title="Toggle full size">${img("originals/"+o.file,"Black ink illustration, original "+o.n,"")}</div><div class="info"><h2 style="font-size:2.2rem">${o.title}</h2><p>${o.note}</p><dl><dt>Medium</dt><dd>${o.medium}</dd><dt>Dimensions</dt><dd>${o.size}</dd><dt>Year</dt><dd>${o.year}</dd><dt>Availability</dt><dd>${o.status}</dd></dl><a href="mailto:${EMAIL}?subject=Enquiry: original ${o.n}">Enquire about this work</a><nav><button data-d="-1">Previous</button><button data-d="1">Next</button><button data-x>Close</button></nav></div>`;d.querySelector(".ph").style.cssText="background:none;aspect-ratio:auto";d.querySelector(".ph img").style.cssText="height:auto";if(!d.open)d.showModal()}
-grid.onclick=e=>{const t=e.target.closest(".tile");if(t)open(+t.dataset.i)};
-d.onclick=e=>{if(e.target.closest("[data-x]")||e.target==d)d.close();const n=e.target.closest("[data-d]");if(n)open((cur+ +n.dataset.d+shown.length)%shown.length);if(e.target.closest(".view"))$(".view",d).classList.toggle("z")};
-d.onkeydown=e=>{if(e.key=="ArrowRight")open((cur+1)%shown.length);if(e.key=="ArrowLeft")open((cur-1+shown.length)%shown.length)};
-document.addEventListener("error",e=>{if(e.target.tagName=="IMG")e.target.remove()},true);
-const m=$("#menu"),l=$("#links");m.onclick=()=>{const o=l.classList.toggle("open");m.setAttribute("aria-expanded",o)};l.onclick=e=>{if(e.target.tagName=="A"){l.classList.remove("open");m.setAttribute("aria-expanded",false)}};
-$("#enq").onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);location.href=`mailto:${EMAIL}?subject=${encodeURIComponent("Commercial enquiry: "+f.get("type"))}&body=${encodeURIComponent(`Name: ${f.get("name")}\nOrganisation: ${f.get("org")}\n\n${f.get("msg")}`)}`};
+/* Sarah Lauren: site behaviour. Content lives in index.html and js/data.js. */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const no = i => "Nº " + String(i + 1).padStart(2, "0");
+const src = f => "assets/images/originals/" + f;
+const mailto = (subject, body) =>
+  `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}${body ? "&body=" + encodeURIComponent(body) : ""}`;
+
+ORIGINALS.forEach((o, i) => { o.n = i; });
+
+/* ---------- email links ---------- */
+$$("[data-mail]").forEach(a => {
+  a.href = mailto(a.dataset.mail);
+  if (a.hasAttribute("data-show")) a.textContent = EMAIL;
+});
+
+/* ---------- works ---------- */
+const works = $("#works"), filters = $("#filters");
+let shown = ORIGINALS;
+
+function draw() {
+  works.innerHTML = shown.map(o => `
+    <article class="work">
+      <button class="work-main" data-w="${o.n}" data-i="0" aria-label="View ${no(o.n)}, ${o.title}">
+        <img src="${src(o.file)}" alt="${o.alt || "Black ink drawing, " + no(o.n)}" loading="lazy">
+      </button>
+      <div class="work-info">
+        <p class="no">${no(o.n)}</p>
+        <h3>${o.title}</h3>
+        <p>${o.note || ""}</p>
+        <dl class="spec">
+          <div><dt>Medium</dt><dd>${o.medium}</dd></div>
+          <div><dt>Dimensions</dt><dd>${o.size}</dd></div>
+          <div><dt>Year</dt><dd>${o.year}</dd></div>
+          <div><dt>Availability</dt><dd>${o.status}</dd></div>
+        </dl>
+        ${(o.details || []).length ? `<div class="thumbs">${o.details.map((f, k) => `
+          <button data-w="${o.n}" data-i="${k + 1}" aria-label="View detail ${k + 1} of ${no(o.n)}">
+            <img src="${src(f)}" alt="Detail ${k + 1} of ${no(o.n)}" loading="lazy">
+          </button>`).join("")}</div>` : ""}
+        <a class="link" href="${mailto("Enquiry: " + no(o.n) + ", " + o.title)}">Enquire about this work</a>
+      </div>
+    </article>`).join("");
+}
+
+const cats = [...new Set(ORIGINALS.map(o => o.cat))];
+if (cats.length > 1) {
+  filters.hidden = false;
+  ["All", ...cats].forEach((c, i) => {
+    const b = document.createElement("button");
+    b.textContent = c;
+    b.setAttribute("aria-pressed", i === 0);
+    b.onclick = () => {
+      $$("button", filters).forEach(x => x.setAttribute("aria-pressed", x === b));
+      shown = c === "All" ? ORIGINALS : ORIGINALS.filter(o => o.cat === c);
+      draw();
+    };
+    filters.append(b);
+  });
+}
+draw();
+
+/* ---------- viewer ---------- */
+const viewer = $("#viewer");
+let cur = { w: 0, i: 0 };
+
+function openViewer(w, i) {
+  const o = ORIGINALS[w], imgs = [o.file, ...(o.details || [])];
+  cur = { w, i: (i + imgs.length) % imgs.length };
+  const label = cur.i === 0 ? "Full work" : `Detail ${cur.i} of ${imgs.length - 1}`;
+  viewer.innerHTML = `
+    <div class="view" title="Select to toggle full size"><img src="${src(imgs[cur.i])}" alt="${o.alt || o.title}"></div>
+    <div class="info">
+      <p class="no">${no(w)}</p>
+      <h2>${o.title}</h2>
+      <p>${o.note || ""}</p>
+      <dl class="spec">
+        <div><dt>Medium</dt><dd>${o.medium}</dd></div>
+        <div><dt>Dimensions</dt><dd>${o.size}</dd></div>
+        <div><dt>Year</dt><dd>${o.year}</dd></div>
+        <div><dt>Availability</dt><dd>${o.status}</dd></div>
+      </dl>
+      <a class="link" href="${mailto("Enquiry: " + no(w) + ", " + o.title)}">Enquire about this work</a>
+      <p class="count">${label}</p>
+      <nav>
+        ${imgs.length > 1 ? `<button data-d="-1">Previous</button><button data-d="1">Next</button>` : ""}
+        <button data-x>Close</button>
+      </nav>
+    </div>`;
+  if (!viewer.open) viewer.showModal();
+}
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-w]");
+  if (t) openViewer(+t.dataset.w, +t.dataset.i);
+});
+viewer.addEventListener("click", e => {
+  if (e.target.closest("[data-x]") || e.target === viewer) return viewer.close();
+  const n = e.target.closest("[data-d]");
+  if (n) return openViewer(cur.w, cur.i + +n.dataset.d);
+  const v = e.target.closest(".view");
+  if (v) v.classList.toggle("zoom");
+});
+viewer.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") openViewer(cur.w, cur.i + 1);
+  if (e.key === "ArrowLeft") openViewer(cur.w, cur.i - 1);
+});
+
+/* ---------- hero loupe: look closer ---------- */
+const loupe = $("#loupe");
+if (loupe) {
+  const lens = $(".lens", loupe), img = $("img", loupe), ZOOM = 2.6;
+  loupe.addEventListener("click", () => openViewer(0, 0));
+  loupe.addEventListener("pointermove", e => {
+    if (e.pointerType === "touch") return;
+    const r = img.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    const s = lens.offsetWidth / 2;
+    lens.style.backgroundImage = `url("${img.currentSrc || img.src}")`;
+    lens.style.backgroundSize = `${r.width * ZOOM}px ${r.height * ZOOM}px`;
+    lens.style.backgroundPosition = `${s - x * ZOOM}px ${s - y * ZOOM}px`;
+    lens.style.transform = `translate(${x - s}px, ${y - s}px)`;
+    lens.classList.add("on");
+  });
+  loupe.addEventListener("pointerleave", () => lens.classList.remove("on"));
+}
+
+/* ---------- mobile menu ---------- */
+const menu = $("#menu"), links = $("#links");
+menu.onclick = () => menu.setAttribute("aria-expanded", links.classList.toggle("open"));
+links.onclick = e => {
+  if (e.target.tagName === "A") { links.classList.remove("open"); menu.setAttribute("aria-expanded", false); }
+};
+
+/* ---------- forms ---------- */
+$("#enq").onsubmit = e => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  location.href = mailto("Collaboration enquiry: " + f.get("type"),
+    `Name: ${f.get("name")}\nOrganisation: ${f.get("org")}\n\n${f.get("msg")}`);
+};
+const news = $("#news");
+if (FORM_ID) {
+  news.action = "https://formspree.io/f/" + FORM_ID;
+  news.method = "post";
+} else {
+  news.onsubmit = e => {
+    e.preventDefault();
+    location.href = mailto("Journal: please add me", "Please add this address to the journal list: " + new FormData(news).get("email"));
+  };
+}
+
+/* An image that fails to load is removed along with its frame, so nothing unfinished shows. */
+document.addEventListener("error", e => {
+  if (e.target.tagName !== "IMG") return;
+  (e.target.closest("figure, .work, .thumbs button") || e.target).remove();
+}, true);

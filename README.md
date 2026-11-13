@@ -1,24 +1,35 @@
-# Studio Macfarlane website
+# Sarah Lauren website
 
 A single-page static site: plain HTML, CSS and JavaScript. No build step, no database.
 
 ## Structure
-- `index.html`: all page text and sections (Originals, Editions, Commercial, Atelier, Learn, Objects, About, Journal/newsletter).
-- `js/data.js`: your artwork list and the studio email. This is the main file you edit.
+- `index.html`: all page text and sections (Art, Objects, Collaborations, Atelier, About, footer).
+- `js/data.js`: your contact email, newsletter form ID and artwork list. This is the main file you edit.
 - `css/style.css`, `js/main.js`: design and behaviour.
-- `assets/images/originals|editions|atelier|objects|portraits|site/`: your images.
+- `assets/images/originals/`: artwork images. `assets/images/atelier/`: macro details and the video poster.
+- `assets/video/process.mp4`: the time-lapse shown in Atelier.
+- `assets/images/site/`: favicon and `share.jpg` (the preview shown when the link is shared).
 
-## Replace placeholders
-1. Save images as JPG (about 2000px on the long edge, under 600 KB) in `assets/images/originals/`. Use the names in `js/data.js` (`original-01.jpg`...), plus `hero.jpg` and `hero-detail.jpg` for the homepage. Placeholders disappear when a file is found.
-2. In `js/data.js`, edit each artwork's `title`, `medium`, `size`, `year`, `status`, `note`, `cat` (the filter category) and `ratio` (for example `3/4` or `4/3`). Copy a line to add a work.
-3. Edit `EDITIONS` the same way. Edit Atelier, Objects and About text and images directly in `index.html`. Replace `studio@yourdomain.com` and `YOUR_FORM_ID` (a free Formspree form) throughout, and add a 1200x630 `assets/images/site/share.jpg`.
-4. To add a section, copy an existing `<section>` in `index.html`, give it a new `id`, and add a link in the `<nav>`.
+## Before publishing
+1. In `js/data.js`, replace `studio@yourdomain.com` with your real email. Every enquiry and register-interest link uses it.
+2. Optional: create a free Formspree form and paste its ID into `FORM_ID` so newsletter signups are collected for you. If left empty, Subscribe opens an email to you instead.
+3. In `js/data.js`, give Nº 01 its title and check its details and availability.
+4. Read the About text in `index.html` and adjust it so it is in your own words.
 
-## GitHub repository and Pages
-1. On github.com create a new public repository, for example `studio-macfarlane`.
+## Adding a work
+1. Save the image as a JPG (about 2000 px on the long edge) in `assets/images/originals/`, plus any close-ups.
+2. In `js/data.js`, copy the existing block inside `ORIGINALS`, paste it after a comma, and edit it. Works are numbered Nº 01, Nº 02 in the order they appear.
+3. Filter buttons appear automatically once works use more than one `cat`.
+4. The homepage image is the first work in the list. To feature a different one, change the image path in the hero section of `index.html`.
+
+## Later sections
+Objects, Editions and Workshops are each a short "register interest" note for now. When there is something real to show, replace the note in `index.html` with images and details. To add a section, copy an existing `<section>`, give it a new `id`, and add a link in the `<nav>`.
+
+## GitHub Pages
+1. On github.com create a new public repository, for example `sarah-lauren`.
 2. Upload every file and folder from this project (Add file > Upload files) and commit.
 3. Go to Settings > Pages. Under Build and deployment choose Deploy from a branch, branch `main`, folder `/ (root)`, then Save.
-4. Your site appears at `https://USERNAME.github.io/studio-macfarlane/`. All paths here are relative, so it works in a subfolder and on a custom domain.
+4. Your site appears at `https://USERNAME.github.io/sarah-lauren/`. All paths are relative, so it works in a subfolder and on a custom domain.
 
 ## Custom domain
 1. In Settings > Pages enter your domain and Save.
@@ -26,9 +37,8 @@ A single-page static site: plain HTML, CSS and JavaScript. No build step, no dat
 3. Wait for DNS (up to a day), then tick Enforce HTTPS.
 
 ## Pre-publication checklist
-- Every nav link scrolls to its section; mobile menu opens and closes.
-- Open each artwork: arrows, Escape and full-size toggle work with the keyboard.
-- Filters work; the enquiry form opens your email app with the details filled in.
-- Placeholder email, form ID, titles and "to be confirmed" text are replaced or accurate.
-- Alt text describes each image; images load quickly on mobile data.
-- Share preview and favicon look right; test in a phone and a desktop browser.
+- Every nav link scrolls to its section; the mobile menu opens and closes.
+- Open the artwork: Previous, Next, Escape and the full-size toggle all work.
+- The enquiry form opens your email app with the details filled in.
+- The email address in the footer is yours.
+- Test on a phone and a desktop browser.
