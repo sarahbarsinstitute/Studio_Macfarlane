@@ -18,11 +18,13 @@ function wireMail(root = document) {
     } else {
       a.removeAttribute("href");
       a.classList.add("off");
-      if (a.hasAttribute("data-show")) a.textContent = "Email to be added";
+      a.setAttribute("aria-disabled", "true");
+      a.title = "Add the studio contact email in js/data.js before publishing";
+      if (a.hasAttribute("data-show")) a.textContent = "Contact details to be added";
+      else if (a.textContent.trim().length === 0) a.textContent = "Contact details to be added";
     }
   });
 }
-if (!EMAIL) $("#setup").hidden = false;
 
 /* ---------- works ---------- */
 const works = $("#works"), filters = $("#filters");
@@ -180,18 +182,6 @@ if (film) {
   }
 }
 
-/* ---------- enquiry form ---------- */
-$("#enq").onsubmit = e => {
-  e.preventDefault();
-  if (!EMAIL) return;
-  const f = new FormData(e.target);
-  location.href = mailto("Enquiry: " + f.get("type"),
-    `Name: ${f.get("name")}\nOrganisation: ${f.get("org")}\n\n${f.get("msg")}`);
-};
-if (!EMAIL) { $("#enq .btn").disabled = true; $("#enq .formnote").textContent = "The enquiry form is switched off until a contact email is added in js/data.js."; }
-
-/* An image that fails to load is removed with its frame, so nothing unfinished shows. */
-document.addEventListener("error", e => {
-  if (e.target.tagName !== "IMG") return;
-  (e.target.closest("figure, .plate, .shot") || e.target).remove();
-}, true);
+/* ---------- contact configuration ---------- */
+/* Add the preferred studio email to js/data.js before publishing.
+   Until then, contact links remain visibly inactive rather than opening a broken form. */
