@@ -22,8 +22,8 @@ const COLOURS = {
 /* The current exhibition shown at the top of the page. */
 const EXHIBITION = {
   title: "The Hidden Face",
-  subtitle: "New drawings in archival ink",
-  when: "Online exhibition, 2026",
+  subtitle: "Original drawings in archival ink",
+  when: "Online exhibition · 2026",
   hero: "06"                      /* catalogue number of the work shown first */
 };
 
@@ -54,7 +54,7 @@ const ORIGINALS = [
     no: "01",
     file: "original-01.jpg",
     details: ["original-01-detail-1.jpg", "original-01-detail-2.jpg", "original-01-detail-3.jpg"],
-    title: "Untitled (Hidden face)",
+    title: "Untitled (Hidden Face)",
     alt: "A smiling face with both hands covering the eyes, strands of hair across the fingertips",
     cat: "Portraits",
     medium: "Archival ink on 300 gsm cotton paper",
@@ -82,7 +82,7 @@ const ORIGINALS = [
   {
     no: "05",
     file: "original-05.jpg",
-    title: "Untitled (From below)",
+    title: "Untitled (From Below)",
     alt: "Close crop of a woman's face seen from below, cut to a sharp rectangle on the left",
     cat: "Portraits",
     medium: "Archival ink on paper",
@@ -91,7 +91,7 @@ const ORIGINALS = [
   {
     no: "03",
     file: "original-03.jpg",
-    title: "Untitled (Over the shoulder)",
+    title: "Untitled (Over the Shoulder)",
     alt: "A woman with swept-back hair resting her chin on her raised shoulder, looking to one side",
     cat: "Portraits",
     medium: "Archival ink on paper",
@@ -101,7 +101,7 @@ const ORIGINALS = [
     no: "04",
     file: "original-04.jpg",
     show: false,
-    title: "Untitled (Hand cream)",
+    title: "Untitled (Hand Cream)",
     alt: "A crumpled, twisted aluminium tube of hand cream standing on its cap",
     cat: "Still life",
     medium: "Archival ink on paper",

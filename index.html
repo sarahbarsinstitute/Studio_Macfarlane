@@ -54,10 +54,10 @@
       <p class="artist-name">Sarah Lauren</p>
     </div>
     <div class="hero-meta">
-      <p id="ex-sub">New drawings in archival ink</p>
-      <p id="ex-when" class="soft">Online exhibition, 2026</p>
+      <p id="ex-sub">Original drawings in archival ink</p>
+      <p id="ex-when" class="soft">Online exhibition · 2026</p>
     </div>
-    <a class="btn" href="#exhibition">Enter the exhibition</a>
+    <a class="btn" href="#exhibition">Explore the exhibition</a>
   </div>
 </section>
 
@@ -65,7 +65,10 @@
 <section class="installation" id="exhibition" aria-labelledby="inst-h">
   <div class="inst-head">
     <h2 id="inst-h">Installation view</h2>
-    <p class="soft">Scroll along the wall. Select a drawing to see it close.</p>
+    <div class="inst-copy">
+      <p>A collection of original drawings exploring portraiture, gesture and the quiet language of the human form.</p>
+      <p class="soft">Move through the works, then select an image to explore the detail.</p>
+    </div>
   </div>
   <div class="wall" id="wall" tabindex="0" aria-label="Works hung on the gallery wall">
     <div class="hang" id="hang"></div>
@@ -75,11 +78,11 @@
 
 <!-- Exhibition text -->
 <section class="statement" aria-labelledby="st-h">
-  <h2 id="st-h" class="visually-hidden">About the exhibition</h2>
-  <p class="lead">The Hidden Face brings together portraits in which the face is turned away, covered or closed: a woman behind her own hands, a profile with the eyes shut, two hands raised to meet.</p>
+  <div class="sec-head"><h2 id="st-h">About the exhibition</h2></div>
+  <p class="lead">The Hidden Face explores the moments when a face becomes partially concealed: a woman looking through her fingers, eyes closed in profile, hands meeting in a quiet gesture.</p>
   <div class="cols">
-    <p>Every tone in these drawings is made from single dots of archival ink on cotton paper. A shadow is simply more dots, set closer together. Nothing is blended, washed or filled, so even a small sheet takes several days.</p>
-    <p>Seen across a room, each drawing reads as a soft photograph. Step closer and it comes apart into thousands of separate marks, each one placed by hand. The exhibition asks for that second look.</p>
+    <p>Working entirely in archival ink on cotton paper, Sarah Lauren builds each image from thousands of individual points. Tonal depth emerges through the density and placement of each mark. A shadow is simply more dots, set closer together.</p>
+    <p>From a distance, the drawings hold the softness and presence of a photograph. Up close, the image resolves into an intricate field of individual marks, each placed by hand. The work rewards a slower kind of looking.</p>
   </div>
 </section>
 
@@ -87,7 +90,7 @@
 <section class="works" id="works" aria-labelledby="works-h">
   <div class="sec-head">
     <h2 id="works-h">Works</h2>
-    <p class="soft">Original drawings, each one of a kind. Prices are given on request.</p>
+    <p class="soft">Original drawings, individually made by hand. Enquiries about availability and pricing are welcome.</p>
   </div>
   <div class="filters" id="filters" role="group" aria-label="Filter works" hidden></div>
   <ol class="checklist" id="checklist"></ol>
@@ -96,14 +99,14 @@
 <figure class="bleed">
   <img src="assets/images/atelier/macro-wide.jpg" width="2400" height="1000" loading="lazy"
        alt="Close detail of a smiling mouth and fingertips, built entirely from ink dots">
-  <figcaption>Untitled (Hidden face), detail</figcaption>
+  <figcaption>Untitled (Hidden Face), detail</figcaption>
 </figure>
 
 <!-- Editions: silk and prints -->
 <section class="editions" id="editions" aria-labelledby="ed-h">
   <div class="sec-head">
     <h2 id="ed-h">Editions</h2>
-    <p class="soft">In preparation. Nothing is for sale yet.</p>
+    <p class="soft">Selected drawings, reimagined as collectible objects.</p>
   </div>
   <div class="ed-grid">
     <figure class="scarf" aria-label="Concept for a silk scarf: a rose drawing framed by a stippled tartan border">
@@ -111,15 +114,16 @@
       <figcaption>Silk square, concept: Rose within a stippled tartan border</figcaption>
     </figure>
     <div class="ed-list">
+      <p class="ed-intro">A series of editions is in development, extending the original drawings into printed works and textiles.</p>
       <article>
         <h3>Silk squares</h3>
-        <p>Silk twill printed from the original drawings, with a hand-rolled hem. Each design in a small numbered run.</p>
+        <p>Silk twill printed from selected original drawings, finished with a hand-rolled hem. Each design is intended for a small, numbered edition.</p>
       </article>
       <article>
         <h3>Fine art prints</h3>
-        <p>Giclée prints on cotton rag, made to order in Aotearoa, each signed and numbered by hand.</p>
+        <p>Giclée prints on cotton rag, planned for production in Aotearoa. Each print will be signed and numbered by hand.</p>
       </article>
-      <a class="text-link" data-mail="Editions: please let me know when they are released">Ask to hear when editions are released</a>
+      <a class="text-link" data-mail="Editions: enquiry about upcoming editions">Enquire about upcoming editions</a>
     </div>
   </div>
 </section>
@@ -127,10 +131,13 @@
 <!-- Commissions and collaborations -->
 <section class="commissions" id="commissions" aria-labelledby="co-h">
   <div class="sec-head">
-    <h2 id="co-h">Commissions and collaborations</h2>
-    <p class="soft">For private collectors, and for fashion, beauty, fragrance and interiors.</p>
+    <h2 id="co-h">Commissions &amp; collaborations</h2>
+    <p class="soft">Original artwork. Distinctive applications. Considered collaborations.</p>
   </div>
-  <p class="lead co-lead">Original artwork licensed for packaging, campaigns and limited editions, and private portrait commissions. Each project begins as a drawing on paper.</p>
+  <div class="co-intro">
+    <p class="lead">Working with private collectors and creative brands across fashion, beauty, fragrance and interiors.</p>
+    <p class="soft">The practice extends beyond the original drawing into portrait commissions, artwork licensing, packaging, editorial imagery and limited-edition objects. Each collaboration begins with an individual artistic perspective, developed through drawing.</p>
+  </div>
 
   <div class="studies">
     <figure class="study study-carton">
@@ -140,7 +147,7 @@
           <div class="carton-label"><span>Hand balm</span><span class="carton-seal" aria-hidden="true"></span><span>75 ml</span></div>
         </div>
       </div>
-      <figcaption>Study for a hand-care carton, using Untitled (Hands)</figcaption>
+      <figcaption>Studio concept: hand-care packaging using Untitled (Hands).</figcaption>
     </figure>
     <figure class="study study-spread">
       <div class="ground">
@@ -149,13 +156,16 @@
           <div class="page page-text"><p class="pull">The art of looking closer.</p><p class="credit">Illustration by Sarah Lauren</p></div>
         </div>
       </div>
-      <figcaption>Study for an editorial spread, using Untitled (Chignon)</figcaption>
+      <figcaption>Studio concept: editorial portraiture using Untitled (Chignon).</figcaption>
     </figure>
   </div>
-  <p class="soft studies-note">These are speculative studies made in the studio, not commissioned projects.</p>
+  <p class="soft studies-note">These images are independent studio studies, created to explore potential applications of the artwork. They are not commissioned projects or existing brand collaborations.</p>
 
   <div class="enquire" id="enquire">
-    <h3>Start a project</h3>
+    <div class="enq-intro">
+      <h3>Start a project</h3>
+      <p class="soft">For private commissions, artwork licensing, editorial enquiries and creative collaborations, get in touch.</p>
+    </div>
     <form id="enq">
       <label>Your name<input name="name" required autocomplete="name"></label>
       <label>Company<input name="org" autocomplete="organization"></label>
@@ -179,23 +189,22 @@
 <section class="studio" id="studio" aria-labelledby="su-h">
   <div class="sec-head">
     <h2 id="su-h">Studio</h2>
-    <p class="soft">Thousands of marks, placed one at a time.</p>
+    <p class="soft">Thousands of marks. Placed one at a time.</p>
   </div>
   <div class="studio-grid">
     <figure class="film">
       <video id="film" src="assets/video/process.mp4" poster="assets/images/atelier/process-poster.jpg" muted loop playsinline preload="none"
              aria-label="Time-lapse of a portrait being drawn, dot by dot"></video>
-      <figcaption>Untitled (Hidden face) in progress: two and a half days in twenty seconds. <button id="filmtoggle" type="button" hidden>Play</button></figcaption>
+      <figcaption>Watch Untitled (Hidden Face) take shape. <button id="filmtoggle" type="button" hidden>Play</button></figcaption>
     </figure>
     <div class="studio-copy">
-      <p class="lead">Each drawing begins as a faint pencil outline. Tone is then built slowly across the sheet in single points of pigment ink.</p>
+      <p class="lead">Each drawing begins with a faint pencil outline. Form and tonal depth are developed gradually, using individual points of pigment ink.</p>
       <dl class="spec">
         <div><dt>Ink</dt><dd>Archival pigment fineliner</dd></div>
-        <div><dt>Paper</dt><dd>100% cotton, hot pressed, 300 gsm</dd></div>
-        <div><dt>Method</dt><dd>Stipple and fine line, by hand</dd></div>
-        <div><dt>Time</dt><dd>Days for each drawing, not hours</dd></div>
+        <div><dt>Paper</dt><dd>100% cotton, hot-pressed, 300 gsm</dd></div>
+        <div><dt>Method</dt><dd>Stippling and fine line, drawn by hand</dd></div>
+        <div><dt>Time</dt><dd>Each drawing develops over several days.</dd></div>
       </dl>
-      <p>Online courses in stippling are being prepared. <a class="text-link" data-mail="Studio: please tell me when courses open">Ask to hear when they open</a></p>
     </div>
     <figure class="m1"><img src="assets/images/atelier/macro-rose.jpg" width="1000" height="1000" loading="lazy" alt="Close detail of the rose petals, shaded entirely in dots"><figcaption>Rose, detail</figcaption></figure>
     <figure class="m2"><img src="assets/images/atelier/macro-hands.jpg" width="1000" height="1000" loading="lazy" alt="Close detail of the fingertips in Untitled (Hands)"><figcaption>Untitled (Hands), detail</figcaption></figure>
@@ -208,15 +217,14 @@
     <h2 id="ar-h">Artist</h2>
   </div>
   <div class="artist-grid">
-    <p class="lead">Sarah Lauren is an artist of Scottish descent who draws in black ink, one mark at a time.</p>
+    <p class="lead">Sarah Lauren is an artist working in black ink, exploring portraiture, gesture and botanical forms through meticulous stippled drawing.</p>
     <div class="artist-body">
-      <p>She trained in fashion design, graduating with honours, and brings that attention to line, proportion and material to portraiture and botanical drawing.</p>
-      <p>She works from Tairāwhiti, on the east coast of Aotearoa. The practice centres on original drawings and extends, through selected collaborations, into silk, editions and teaching.</p>
+      <p>With a background in fashion design, she brings an attention to line, proportion, texture and material to her practice.</p>
+      <p>Based in Tairāwhiti, on the east coast of Aotearoa New Zealand, her work centres on original drawings and their potential to extend into textiles, editions and creative collaborations.</p>
     </div>
     <dl class="cv">
       <div><dt>Lives and works</dt><dd>Tairāwhiti, Aotearoa New Zealand</dd></div>
-      <div><dt>Education</dt><dd>Bachelor of Design (Honours), fashion design</dd></div>
-      <div><dt>Exhibitions</dt><dd>The Hidden Face, online exhibition, 2026</dd></div>
+      <div><dt>Education</dt><dd>Bachelor of Design (Honours), Fashion Design</dd></div>
     </dl>
   </div>
 </section>
@@ -228,13 +236,13 @@
     <div>
       <h2>Enquiries</h2>
       <p class="mail"><a data-mail="Enquiry" data-show></a></p>
-      <p class="soft">For original drawings, commissions, licensing and collaborations.</p>
+      <p class="soft">For original artwork, private commissions, licensing and collaborations.</p>
       <a class="btn" href="#enquire">Start a project</a>
     </div>
     <div>
       <h2>Journal</h2>
-      <p class="soft">Occasional letters about new work and exhibitions.</p>
-      <a class="text-link" data-mail="Journal: please add me to the list">Join the list</a>
+      <p class="soft">Occasional notes from the studio, including new drawings, works in progress and upcoming editions.</p>
+      <a class="text-link" data-mail="Journal: please add me to the studio mailing list">Join the studio mailing list</a>
     </div>
     <span class="seal seal-lg" aria-hidden="true">SL</span>
   </div>

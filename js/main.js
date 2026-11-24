@@ -99,7 +99,7 @@ const tomb = o => `
   <h3>${esc(o.title)}${o.year ? ", " + esc(o.year) : ""}</h3>
   <p class="t-med">${esc(o.medium)}</p>
   ${o.size ? `<p class="t-med">${esc(o.size)}</p>` : ""}
-  <p class="t-status">${o.dot ? `<span class="dot" aria-hidden="true"></span>` : ""}${esc(o.priceText)}</p>`;
+  ${o.dot ? `<p class="t-status"><span class="dot" aria-hidden="true"></span>${esc(o.status)}</p>` : ""}`;
 
 function drawList() {
   list.innerHTML = shown.map(o => `
