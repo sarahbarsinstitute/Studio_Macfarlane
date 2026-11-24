@@ -5,9 +5,29 @@ const src = f => "assets/images/originals/" + f;
 const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const mailto = (subject, body) =>
   `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}${body ? "&body=" + encodeURIComponent(body) : ""}`;
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+
+/* Size "17 × 20 cm" becomes { w: 17, h: 20 }; empty sizes return null. */
+const cm = s => {
+  const m = String(s || "").match(/([\d.]+)\s*[×x]\s*([\d.]+)/);
+  return m ? { w: +m[1], h: +m[2] } : null;
+};
 
 const WORKS = ORIGINALS.filter(o => o.show !== false);
-WORKS.forEach((o, i) => { o.i = i; o.label = "Nº " + o.no; });
+WORKS.forEach((o, i) => {
+  o.i = i;
+  o.dims = cm(o.size);
+  o.dot = /^(sold|reserved)$/i.test(o.status || "");
+  o.priceText = o.dot ? o.status : (/private/i.test(o.status || "") ? "Private collection" : (o.price || "Price on request"));
+});
+
+/* ---------- hero colour: try another with ?colour=indigo (see COLOURS in data.js) ---------- */
+const pick = new URLSearchParams(location.search).get("colour");
+const hue = (pick && COLOURS[pick]) || COLOURS[HERO_COLOUR];
+if (hue) {
+  document.documentElement.style.setProperty("--shu", hue[0]);
+  document.documentElement.style.setProperty("--shu-deep", hue[1]);
+}
 
 /* ---------- contact email ---------- */
 function wireMail(root = document) {
@@ -24,99 +44,162 @@ function wireMail(root = document) {
 }
 if (!EMAIL) $("#setup").hidden = false;
 
-/* ---------- works ---------- */
-const works = $("#works"), filters = $("#filters");
-let shown = WORKS;
+/* ---------- the exhibition ---------- */
+$("#ex-title").textContent = EXHIBITION.title;
+$("#ex-sub").textContent = EXHIBITION.subtitle;
+$("#ex-when").textContent = EXHIBITION.when;
+const heroWork = WORKS.find(o => o.no === EXHIBITION.hero) || WORKS[0];
+const heroImg = $("#heroimg");
+heroImg.src = src(heroWork.hero || heroWork.file);
+heroImg.alt = "Stipple drawing in black ink: " + heroWork.alt;
+$("#loupe").setAttribute("aria-label", "Open " + heroWork.title + " in the viewer");
 
-const row = (k, v) => v ? `<div><dt>${k}</dt><dd>${v}</dd></div>` : "";
-const spec = o => `<dl class="spec">${row("Medium", o.medium)}${row("Size", o.size)}${row("Year", o.year)}${row("Availability", o.status)}</dl>`;
-const enquire = o => `<a class="quiet-link" data-mail="Enquiry: ${o.label}, ${o.title}">Enquire about this drawing</a>`;
-const shot = (o, k, cls, alt) => `
-  <button class="shot ${cls}" type="button" data-w="${o.i}" data-k="${k}" aria-label="View ${k ? "detail " + k + " of " : ""}${o.label}, ${o.title}">
-    <img src="${src(k ? o.details[k - 1] : o.file)}" alt="${alt}" loading="lazy">
-  </button>`;
-
-function draw() {
-  const feat = shown.filter(o => o.feature), rest = shown.filter(o => !o.feature);
-  works.innerHTML = feat.map(o => `
-    <article class="feature">
-      ${shot(o, 0, "f-main", o.alt)}
-      <div class="f-info">
-        <p class="no">${o.label}</p>
-        <h3>${o.title}</h3>
-        ${o.note ? `<p>${o.note}</p>` : ""}
-        ${spec(o)}
-        ${enquire(o)}
-      </div>
-      ${(o.details || []).slice(0, 3).map((f, k) => shot(o, k + 1, "f-d" + (k + 1), `Detail ${k + 1} of ${o.label}`)).join("")}
-    </article>`).join("") + (rest.length ? `<div class="sequence">${rest.map(o => `
-      <article class="plate">
-        ${shot(o, 0, "", o.alt)}
-        <p class="cap"><span class="no">${o.label}</span> ${o.title}${[o.medium, o.size, o.year].filter(Boolean).map(x => ", " + x).join("")}</p>
-      </article>`).join("")}</div>` : "");
-  wireMail(works);
+/* ---------- installation wall: works hung in a row, centred on one line ---------- */
+const hang = $("#hang");
+function hangWall() {
+  hang.innerHTML = WORKS.map(o => {
+    const d = o.dims || { h: 20, w: 20 * (o.ratio || .72) };
+    return `<button class="hung" type="button" data-w="${o.i}" style="--w:${d.w};--h:${d.h}" aria-label="View ${esc(o.title)}">
+      <span class="frame"><img src="${src(o.file)}" alt="${esc(o.alt)}" loading="lazy" data-ratio="${o.i}"></span>
+      <span class="wall-label"><b>${esc(o.title)}</b>${o.year ? esc(o.year) : ""}${o.dot ? `<br><span class="dot" aria-hidden="true"></span>${esc(o.status)}` : ""}</span>
+    </button>`;
+  }).join("");
+  /* works without a size take their proportions from the photograph */
+  $$("img[data-ratio]", hang).forEach(img => {
+    const set = () => {
+      const o = WORKS[+img.dataset.ratio];
+      if (o.dims || !img.naturalWidth) return;
+      img.closest(".hung").style.setProperty("--w", (20 * img.naturalWidth / img.naturalHeight).toFixed(2));
+    };
+    img.complete ? set() : img.addEventListener("load", set, { once: true });
+  });
 }
+hangWall();
 
+/* A mouse wheel moves the wall sideways once the pointer is over it. */
+const wall = $("#wall");
+wall.addEventListener("wheel", e => {
+  if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+  const max = wall.scrollWidth - wall.clientWidth;
+  const next = wall.scrollLeft + e.deltaY;
+  if ((e.deltaY < 0 && wall.scrollLeft <= 0) || (e.deltaY > 0 && wall.scrollLeft >= max)) return;
+  e.preventDefault();
+  wall.scrollLeft = Math.max(0, Math.min(max, next));
+}, { passive: false });
+wall.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") wall.scrollBy({ left: 320, behavior: calm ? "auto" : "smooth" });
+  if (e.key === "ArrowLeft") wall.scrollBy({ left: -320, behavior: calm ? "auto" : "smooth" });
+});
+
+/* ---------- checklist of works, with wall labels ---------- */
+const list = $("#checklist"), filters = $("#filters");
+let shown = WORKS;
+const tomb = o => `
+  <p class="t-artist">Sarah Lauren</p>
+  <h3>${esc(o.title)}${o.year ? ", " + esc(o.year) : ""}</h3>
+  <p class="t-med">${esc(o.medium)}</p>
+  ${o.size ? `<p class="t-med">${esc(o.size)}</p>` : ""}
+  <p class="t-status">${o.dot ? `<span class="dot" aria-hidden="true"></span>` : ""}${esc(o.priceText)}</p>`;
+
+function drawList() {
+  list.innerHTML = shown.map(o => `
+    <li class="plate">
+      <button class="pic" type="button" data-w="${o.i}" aria-label="View ${esc(o.title)}">
+        <img src="${src(o.file)}" alt="${esc(o.alt)}" loading="lazy">
+      </button>
+      <div class="tomb">${tomb(o)}<button class="quiet" type="button" data-w="${o.i}">View work</button></div>
+    </li>`).join("");
+}
 const cats = [...new Set(WORKS.map(o => o.cat))];
 if (cats.length > 1) {
   filters.hidden = false;
-  ["All", ...cats].forEach((c, i) => {
+  ["All works", ...cats].forEach((c, i) => {
     const b = document.createElement("button");
     b.type = "button";
     b.textContent = c;
     b.setAttribute("aria-pressed", i === 0);
     b.onclick = () => {
       $$("button", filters).forEach(x => x.setAttribute("aria-pressed", x === b));
-      shown = c === "All" ? WORKS : WORKS.filter(o => o.cat === c);
-      draw();
+      shown = i === 0 ? WORKS : WORKS.filter(o => o.cat === c);
+      drawList();
     };
     filters.append(b);
   });
 }
-draw();
+drawList();
 wireMail();
 
-/* ---------- viewer ---------- */
+/* ---------- artwork viewer ---------- */
 const viewer = $("#viewer");
-let cur = { w: 0, k: 0 };
+let cur = { w: 0, k: 0, room: false };
 
-function openViewer(w, k) {
+function stage(o, imgs) {
+  if (cur.room && o.dims) {
+    return `<div class="stage"><div class="room" id="room" style="--w:${o.dims.w};--h:${o.dims.h}">
+      <span class="frame"><img src="${src(o.file)}" alt="${esc(o.alt)}"></span>
+      <span class="bench" aria-hidden="true"></span>
+      <p class="scale-note">Drawn to scale, framed, above a 120 cm bench</p>
+    </div></div>`;
+  }
+  return `<div class="stage">
+    <div class="view" title="Select to see full size"><img src="${src(imgs[cur.k])}" alt="${esc(o.alt)}${cur.k ? ", detail" : ""}"></div>
+    ${imgs.length > 1 ? `<div class="thumbs">${imgs.map((f, k) => `
+      <button type="button" data-k="${k}" aria-label="${k ? "Detail " + k : "Whole drawing"}" aria-current="${k === cur.k}"><img src="${src(f)}" alt=""></button>`).join("")}</div>` : ""}
+  </div>`;
+}
+
+function openViewer(w, k = 0, room = false) {
   const o = WORKS[w], imgs = [o.file, ...(o.details || [])];
-  cur = { w, k: (k + imgs.length) % imgs.length };
-  const label = imgs.length > 1 ? (cur.k === 0 ? "Whole drawing" : `Detail ${cur.k} of ${imgs.length - 1}`) : "";
+  cur = { w, k: Math.max(0, Math.min(k, imgs.length - 1)), room: room && !!o.dims };
+  const row = (a, b) => b ? `<div><dt>${a}</dt><dd>${esc(b)}</dd></div>` : "";
   viewer.innerHTML = `
-    <div class="view" title="Select to see full size"><img src="${src(imgs[cur.k])}" alt="${o.alt || o.title}"></div>
-    <div class="info">
-      <p class="no">${o.label}</p>
-      <h2>${o.title}</h2>
-      ${o.note ? `<p>${o.note}</p>` : ""}
-      ${spec(o)}
-      ${enquire(o)}
-      <p class="count">${label}</p>
+    ${stage(o, imgs)}
+    <div class="label">
+      <button class="quiet close" type="button" data-x>Close</button>
+      <p class="t-artist">Sarah Lauren</p>
+      <h2>${esc(o.title)}</h2>
+      ${o.year ? `<p class="t-year">${esc(o.year)}</p>` : ""}
+      <dl class="spec">${row("Medium", o.medium)}${row("Size", o.size)}${row("Category", o.cat)}</dl>
+      ${o.note ? `<p class="note">${esc(o.note)}</p>` : ""}
+      <p class="price">${o.dot ? `<span class="dot" aria-hidden="true"></span>` : ""}${esc(o.priceText)}</p>
+      <a class="btn" data-mail="Enquiry: ${esc(o.title)}${o.year ? ", " + esc(o.year) : ""}">Enquire about this work</a>
+      ${o.dims ? `<button class="quiet roomtoggle" type="button" data-room>${cur.room ? "Back to the drawing" : "See it on a wall"}</button>` : ""}
       <nav>
-        <button type="button" data-d="-1">Previous</button><button type="button" data-d="1">Next</button>
-        <button type="button" data-x>Close</button>
+        <button class="quiet" type="button" data-d="-1">Previous work</button>
+        <button class="quiet" type="button" data-d="1">Next work</button>
       </nav>
     </div>`;
   wireMail(viewer);
   if (!viewer.open) viewer.showModal();
-}
-/* Previous and Next step through a drawing's images, then on to the neighbouring drawing. */
-function step(d) {
-  const n = 1 + (WORKS[cur.w].details || []).length, k = cur.k + d;
-  if (k >= 0 && k < n) return openViewer(cur.w, k);
-  const w = (cur.w + d + WORKS.length) % WORKS.length;
-  openViewer(w, d > 0 ? 0 : (WORKS[w].details || []).length);
+  if (cur.room) scaleRoom();
 }
 
+/* The room shows 260 cm of wall above the floor; the work hangs centred 150 cm up. */
+function scaleRoom() {
+  const room = $("#room");
+  if (!room) return;
+  const o = WORKS[cur.w], H = room.clientHeight, floor = Math.round(H * .1), k = (H - floor) / 260;
+  const framed = o.dims.h + 2 * 5 + 2 * 1.5;
+  room.style.setProperty("--k", k + "px");
+  room.style.setProperty("--floor", floor + "px");
+  room.style.setProperty("--lift", ((150 - framed / 2) * k) + "px");
+}
+addEventListener("resize", scaleRoom);
+
+const step = d => openViewer((cur.w + d + WORKS.length) % WORKS.length, 0, false);
+
 document.addEventListener("click", e => {
+  if (viewer.contains(e.target)) return;
   const t = e.target.closest("[data-w]");
-  if (t) openViewer(+t.dataset.w, +t.dataset.k);
+  if (t) openViewer(+t.dataset.w);
 });
 viewer.addEventListener("click", e => {
-  if (e.target.closest("[data-x]") || e.target === viewer) return viewer.close();
+  if (e.target.closest("[data-x]")) return viewer.close();
   const n = e.target.closest("[data-d]");
   if (n) return step(+n.dataset.d);
+  const th = e.target.closest("[data-k]");
+  if (th) return openViewer(cur.w, +th.dataset.k);
+  if (e.target.closest("[data-room]")) return openViewer(cur.w, 0, !cur.room);
   const v = e.target.closest(".view");
   if (v) v.classList.toggle("zoom");
 });
@@ -124,17 +207,19 @@ viewer.addEventListener("keydown", e => {
   if (e.key === "ArrowRight") step(1);
   if (e.key === "ArrowLeft") step(-1);
 });
+viewer.addEventListener("close", () => { document.body.style.overflow = ""; });
+viewer.addEventListener("cancel", () => { document.body.style.overflow = ""; });
+new MutationObserver(() => { document.body.style.overflow = viewer.open ? "hidden" : ""; }).observe(viewer, { attributes: true, attributeFilter: ["open"] });
 
 /* ---------- hero loupe ---------- */
 const loupe = $("#loupe");
 if (loupe) {
-  const lens = $(".lens", loupe), img = $("img", loupe), ZOOM = 2.8;
-  const heroIndex = WORKS.findIndex(o => o.no === "06");
-  loupe.addEventListener("click", () => openViewer(heroIndex < 0 ? 0 : heroIndex, 0));
+  const lens = $(".lens", loupe), ZOOM = 2.8;
+  loupe.addEventListener("click", () => openViewer(heroWork.i));
   loupe.addEventListener("pointermove", e => {
     if (e.pointerType === "touch") return;
-    const r = img.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, s = lens.offsetWidth / 2;
-    lens.style.backgroundImage = `url("${img.currentSrc || img.src}")`;
+    const r = heroImg.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, s = lens.offsetWidth / 2;
+    lens.style.backgroundImage = `url("${heroImg.currentSrc || heroImg.src}")`;
     lens.style.backgroundSize = `${r.width * ZOOM}px ${r.height * ZOOM}px`;
     lens.style.backgroundPosition = `${s - x * ZOOM}px ${s - y * ZOOM}px`;
     lens.style.transform = `translate(${x - s}px, ${y - s}px)`;
@@ -143,11 +228,18 @@ if (loupe) {
   loupe.addEventListener("pointerleave", () => lens.classList.remove("on"));
 }
 
-/* ---------- header gains a background once the page scrolls ---------- */
+/* ---------- header: background on scroll, current section underlined ---------- */
 const bar = $(".bar");
 const onScroll = () => bar.classList.toggle("scrolled", scrollY > 24);
 addEventListener("scroll", onScroll, { passive: true });
 onScroll();
+if ("IntersectionObserver" in window) {
+  const navs = $$("#links a");
+  const navObs = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) navs.forEach(a => a.classList.toggle("here", a.getAttribute("href") === "#" + e.target.id));
+  }), { rootMargin: "-45% 0px -50% 0px" });
+  navs.forEach(a => { const t = $(a.getAttribute("href")); if (t) navObs.observe(t); });
+}
 
 const menu = $("#menu"), links = $("#links");
 menu.onclick = () => menu.setAttribute("aria-expanded", links.classList.toggle("open"));
@@ -186,6 +278,6 @@ if (!EMAIL) {
 
 /* An image that fails to load is removed with its frame, so nothing unfinished shows. */
 document.addEventListener("error", e => {
-  if (e.target.tagName !== "IMG") return;
-  (e.target.closest("figure, .plate, .shot") || e.target).remove();
+  if (e.target.tagName !== "IMG" || viewer.contains(e.target)) return;
+  (e.target.closest(".plate, .hung, figure") || e.target).remove();
 }, true);
